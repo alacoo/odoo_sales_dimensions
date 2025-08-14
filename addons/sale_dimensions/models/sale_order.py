@@ -39,7 +39,6 @@ class SaleOrderLine(models.Model):
         
     @api.onchange('x_length', 'x_width', 'x_height')
     def _onchange_dimensions(self):
-        
                 # Calcular la cantidad
         if self.x_length > 0 and self.x_width > 0 and self.x_height > 0:
             self.product_uom_qty = self._calculate_product_qty(
@@ -58,8 +57,8 @@ class SaleOrderLine(models.Model):
                 self.product_uom_qty = 0.0
                 return {
                     'warning': {
-                        'title': 'Valor inválido',
-                        'message': f'{field_name.replace("x_", "").capitalize()} no puede ser negativo. Se ha restablecido a 0.',
+                        'title': 'Invalid Dimension Value',
+                        'message': f'{field_name.replace("x_", "").capitalize()} must be a non-negative number.',
                     }
                 }
 
@@ -75,8 +74,8 @@ class SaleOrderLine(models.Model):
         if self.x_length == 0.0 and self.x_width == 0.0 and self.x_height == 0.0:
             return {
                 'warning': {
-                    'title': 'Advertencia de dimensiones',
-                    'message': 'Todas las dimensiones son 0. La cantidad y el subtotal de esta línea serán 0.',
+                    'title': 'Dimensions Error',
+                    'message': 'All dimensions are 0. The quantity and subtotal for this line will be 0.',
                 }
             }
 
@@ -103,7 +102,7 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     x_line_dimensions = fields.Char(
-        string="Dimensiones de Línea",
+        string="Dimensions",
         compute='_compute_line_dimensions',
         store=True
     )

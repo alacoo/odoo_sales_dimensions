@@ -42,6 +42,7 @@ Personalización de vista: Se heredaron vistas para mostrar los campos en el for
 
 Unidad de medida: Se creó uom_length como campo separado para permitir distintas unidades (m, cm, in) por línea.
 
+
 ## Screenshots
 Formulario de SO con dimensiones:
 
