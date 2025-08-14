@@ -1,0 +1,23 @@
+<odoo>
+    <template id="sale_order_portal_content_inherit" inherit_id="sale.sale_order_portal_content">
+        <xpath expr="//th[@id='product_qty_header']" position="replace">
+            <th class="text-end">Length</th>
+            <th class="text-end">Width</th>
+            <th class="text-end">Height</th>
+        </xpath>
+
+        <xpath expr="//t[@name='product_line_row']/td[@id='quote_qty_td']" position="replace">
+            <td class="text-end">
+                <span t-field="line.x_length" />
+            </td>
+            <td class="text-end">
+                <span t-field="line.x_width" />
+            </td>
+            <td class="text-end">
+                <span t-field="line.x_height" />
+            </td>
+        </xpath>
+
+        
+    </template>
+</odoo>

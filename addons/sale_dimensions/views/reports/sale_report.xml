@@ -1,0 +1,35 @@
+<odoo>
+    <data>
+        <template id="report_saleorder_document_inherit_dimensions" inherit_id="sale.report_saleorder_document">
+            
+            <xpath expr="//table/thead/tr/th[@name='th_description']" position="after">
+                <th class="text-right">Length</th>
+                <th class="text-right">Width</th>
+                <th class="text-right">Height</th>
+            </xpath>
+            
+            <xpath expr="//table/thead/tr/th[@name='th_quantity']" position="attributes">
+                <attribute name="class">d-none</attribute>
+            </xpath>
+
+            <xpath expr="//td[@name='td_name']" position="after">
+                <td class="text-right">
+                    <span t-field="line.x_length"/>
+                    <span t-if="line.uom_length"> <t t-esc="line.uom_length.name"/></span>
+                </td>
+                <td class="text-right">
+                    <span t-field="line.x_width"/>
+                    <span t-if="line.uom_length"> <t t-esc="line.uom_length.name"/></span>
+                </td>
+                <td class="text-right">
+                    <span t-field="line.x_height"/>
+                    <span t-if="line.uom_length"> <t t-esc="line.uom_length.name"/></span>
+                </td>
+            </xpath>
+            
+            <xpath expr="//td[@name='td_quantity']" position="attributes">
+                <attribute name="class">d-none</attribute>
+            </xpath>
+        </template>
+    </data>
+</odoo>
