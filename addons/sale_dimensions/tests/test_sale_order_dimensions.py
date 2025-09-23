@@ -27,16 +27,14 @@ class TestSaleOrderDimensions(TransactionCase):
             'product_id': self.product.id,
             'x_length': 2.0,
             'x_width': 3.0,
-            'x_height': 4.0,
             'price_unit': self.product.list_price,
         })
 
-        expected_qty = 2.0 * 3.0 * 4.0  
+        expected_qty = 2.0 * 3.0
         expected_subtotal = expected_qty * line.price_unit  
 
         print(f"Length: {line.x_length}")
         print(f"Width: {line.x_width}")
-        print(f"Height: {line.x_height}")
         print(f"Quantity calculated: {line.product_uom_qty}")
         print(f"Quantity expected: {expected_qty}")
         print(f"Subtotal calculated: {line.price_subtotal}")

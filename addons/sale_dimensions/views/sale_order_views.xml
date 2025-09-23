@@ -10,7 +10,6 @@
                     <field name="product_uom_qty" readonly="1" />
                     <field name="x_length" />
                     <field name="x_width" />
-                    <field name="x_height" />
                     <field name="uom_length" options="{'no_create': True}" class="oe_inline" />
                 </xpath>
                 <xpath expr="//field[@name='order_line']/form//field[@name='product_uom_qty']"
@@ -18,7 +17,6 @@
                     <field name="product_uom_qty" readonly="1" />
                     <field name="x_length" />
                     <field name="x_width" />
-                    <field name="x_height" />
                     <field name="uom_length" options="{'no_create': True}" class="oe_inline" />
                 </xpath>
                 <xpath expr="//field[@name='order_line']/list/field[@name='product_uom']"
