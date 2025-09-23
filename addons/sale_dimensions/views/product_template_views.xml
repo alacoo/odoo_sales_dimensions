@@ -1,0 +1,16 @@
+<odoo>
+    <data>
+        <record id="product_template_form_view_inherit_dimensions" model="ir.ui.view">
+            <field name="name">product.template.form.inherit.dimensions</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='sales']" position="inside">
+                    <group string="Dimensions">
+                        <field name="allow_variable_dimensions"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
