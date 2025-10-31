@@ -1,45 +1,41 @@
 {
-    'name': 'Sale Dimensions',
-    'version': '18.0.3.0.0',
-    'category': 'Sales',
-    'summary': 'إضافة أبعاد الطول والعرض مع حساب السعر بناءً على المساحة',
+    'name': 'Sale & Invoice Dimensions',
+    'version': '18.0.4.0.0',
+    'category': 'Sales/Invoicing',
+    'summary': 'Adds dimensional pricing (Length x Width) to Sales and Invoices.',
     'description': '''
-## Comprehensive Dimensional Pricing
+## Comprehensive Dimensional Pricing for Sales & Invoicing
 
-This addon enhances Odoo's sales process for products sold by area.
+This addon enhances Odoo's sales and invoicing process for products sold by area.
 
-**For Users:**
-- Activate "Allow Variable Dimensions" on a product.
-- Set a "Price per Sq/m" for that product.
-- In the Sales Order, when you add this product, you can specify Length and Width.
-- The Unit Price will be automatically calculated (Length x Width x Price per Sq/m).
-- The Quantity field remains available for specifying the number of copies.
-- You can also override the "Price per Sq/m" on any sales order line for flexibility.
-
-**For Developers:**
-- The logic is primarily handled via onchange methods on `sale.order.line`.
-- `_onchange_product_id_dimensions()`: Sets defaults and a UI control flag.
-- `_onchange_dimensions_price()`: Calculates the `price_unit` and enforces dimension rules.
-- The UI uses modern Odoo 18 direct attributes (`readonly`, `invisible`) instead of the deprecated `attrs` system.
+**Key Features:**
+- **Dimensional Products:** Activate dimensional calculations on a per-product basis.
+- **Price by Area:** Set a "Price per Sq/m" on the product.
+- **Automatic Price Calculation:** In Sales Orders and Invoices, the Unit Price is automatically calculated from `Length x Width x Price/Sqm`.
+- **Manual Quantity:** The `Quantity` field remains independent for entering the number of copies.
+- **Flexible Pricing:** The `Price per Sq/m` is editable on each sales/invoice line.
+- **SO to Invoice Flow:** Dimensional data is correctly transferred when creating an invoice from a sales order.
 
 ---
 
 ### الوصف بالعربية:
 
-هذه الإضافة تقوم بتطوير أوامر البيع لإدارة المنتجات التي تباع حسب الأبعاد (مثل خدمات الطباعة).
+هذه الإضافة تقوم بتطوير أوامر البيع والفواتير لإدارة المنتجات التي تباع حسب الأبعاد.
 
 **الميزات الرئيسية:**
 - إضافة حقل "سعر المتر المربع" في صفحة المنتج.
-- في أمر البيع، يتم حساب "سعر الوحدة" تلقائياً بناءً على الطول والعرض وسعر المتر المربع.
+- في أوامر البيع والفواتير، يتم حساب "سعر الوحدة" تلقائياً بناءً على الطول والعرض وسعر المتر المربع.
 - يبقى حقل "الكمية" متاحاً لإدخال عدد النسخ.
-- إمكانية تعديل سعر المتر المربع يدوياً في كل سطر من سطور أمر البيع.
+- إمكانية تعديل سعر المتر المربع يدوياً في كل سطر.
+- نقل بيانات الأبعاد تلقائياً عند إنشاء فاتورة من أمر بيع.
     ''',
     'author': 'Tu Nombre',
     'website': 'https://www.tuempresa.com',
-    'depends': ['sale'],
+    'depends': ['sale', 'account'],
     'data': [
         'security/ir.model.access.csv',
         'views/sale_order_views.xml',
+        'views/account_move_views.xml',
         'views/sale_order_portal_templates.xml',
         'views/reports/sale_report.xml',
     ],

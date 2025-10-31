@@ -34,9 +34,6 @@ class SaleOrderLine(models.Model):
         help='Unit of measure for length.'
     )
 
-    # This is a non-stored field used to control the UI (e.g., readonly attributes).
-    # It is set manually in the _onchange_product_id_dimensions method because relying
-    # on a related field proved unreliable with the Odoo 18 web client's new view rendering.
     allow_variable_dimensions = fields.Boolean(
         string='Allow Variable Dimensions',
         default=False,
@@ -47,18 +44,10 @@ class SaleOrderLine(models.Model):
 
     @api.onchange('product_id')
     def _onchange_product_id_dimensions(self):
-        """ 
-        Triggered when the product is changed on the SO line.
-        - Checks if the new product is a dimensional product.
-        - Sets the 'allow_variable_dimensions' flag for UI control.
-        - Sets the default price_per_sqm from the product.
-        - Resets dimension fields to 0 for non-dimensional products.
-        """
         if self.product_id and self.product_id.product_tmpl_id.allow_variable_dimensions:
             self.allow_variable_dimensions = True
             self.price_per_sqm = self.product_id.product_tmpl_id.price_per_sqm
-            # Only set default dimensions for brand new lines, not when editing existing ones.
-            if not self.id:
+            if not self.id: # Only set defaults for new lines
                 self.x_length = 1.0
                 self.x_width = 1.0
         else:
@@ -67,31 +56,42 @@ class SaleOrderLine(models.Model):
             self.x_length = 0.0
             self.x_width = 0.0
         
-        # Trigger the price calculation after setting the defaults.
         self._onchange_dimensions_price()
 
     @api.onchange('x_length', 'x_width', 'price_per_sqm')
     def _onchange_dimensions_price(self):
-        """
-        Triggered when any dimensional value is changed.
-        - Calculates the unit price based on dimensions and price_per_sqm.
-        - Contains a fallback check to enforce that dimensions are 0 for non-dimensional products.
-          This is a robust workaround for potential UI unresponsiveness where a user might
-          be able to enter values in a field that should be readonly.
-        """
-        # Robustness check: If the product is not dimensional, forcibly reset the values.
         if self.product_id and not self.product_id.product_tmpl_id.allow_variable_dimensions:
             self.x_length = 0.0
             self.x_width = 0.0
             self.price_per_sqm = 0.0
 
-        # Main price calculation logic
         if self.allow_variable_dimensions and self.price_per_sqm > 0:
             self.price_unit = self.x_length * self.x_width * self.price_per_sqm
         elif not self.allow_variable_dimensions:
-            # For standard products, the price is set by the main product_id onchange in Odoo.
-            # We do nothing here to avoid interfering with standard behavior.
+            # For standard products, the price is set by the main product_id onchange.
+            # We don't need to do anything here to keep the standard price.
             pass
+
+    def _prepare_invoice_line(self, **optional_values):
+        """
+        Override to pass dimensional fields to the invoice line.
+        """
+        res = super(SaleOrderLine, self)._prepare_invoice_line(**optional_values)
+        if self.allow_variable_dimensions:
+            res.update({
+                'x_length': self.x_length,
+                'x_width': self.x_width,
+                'price_per_sqm': self.price_per_sqm,
+                'allow_variable_dimensions': self.allow_variable_dimensions,
+            })
+        else:
+            res.update({
+                'x_length': 0.0,
+                'x_width': 0.0,
+                'price_per_sqm': 0.0,
+                'allow_variable_dimensions': False,
+            })
+        return res
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'

@@ -6,7 +6,7 @@
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']/list/field[@name='product_template_id']" position="after">
-                    <field name="allow_variable_dimensions" invisible="1"/>
+                    <field name="allow_variable_dimensions" column_invisible="True"/>
                     <field name="x_length" readonly="not allow_variable_dimensions" force_save="1"/>
                     <field name="x_width" readonly="not allow_variable_dimensions" force_save="1"/>
                     <field name="price_per_sqm" readonly="not allow_variable_dimensions" force_save="1"/>
