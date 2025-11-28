@@ -19,6 +19,10 @@
                         <field name="price_per_sqm" readonly="not allow_variable_dimensions" force_save="1"/>
                     </group>
                 </xpath>
+                <xpath expr="//field[@name='order_line']/list/field[@name='price_unit']" position="attributes">
+                     <attribute name="readonly">allow_variable_dimensions</attribute>
+                     <attribute name="force_save">1</attribute>
+                </xpath>
             </field>
         </record>
 
@@ -30,6 +34,20 @@
                 <xpath expr="//field[@name='optional_product_ids']" position="before">
                     <field name="allow_variable_dimensions"/>
                     <field name="price_per_sqm" invisible="not allow_variable_dimensions"/>
+                    <field name="production_margin" invisible="not allow_variable_dimensions"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Product Variant View to set specific prices -->
+        <record id="product_product_form_view_inherit_dimensions" model="ir.ui.view">
+            <field name="name">product.product.form.inherit.dimensions</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='lst_price']" position="after">
+                    <field name="allow_variable_dimensions" invisible="1"/>
+                    <field name="variant_price_per_sqm"/>
                 </xpath>
             </field>
         </record>

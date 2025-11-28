@@ -10,7 +10,20 @@ class ProductTemplate(models.Model):
     )
     price_per_sqm = fields.Float(
         string='Price per Sq/m',
-        help='The price per square meter for products sold by dimension.'
+        help='The base price per square meter. Can be overridden in Variants.'
+    )
+    production_margin = fields.Float(
+        string='Production Margin (m)',
+        default=0.0,
+        help='Extra length to add for production (waste/margins). This will be used in Manufacturing.'
+    )
+
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
+
+    variant_price_per_sqm = fields.Float(
+        string='Variant Price per Sq/m',
+        help='Specific price for this variant. If 0, uses the Template price.'
     )
 
 class SaleOrderLine(models.Model):
@@ -44,11 +57,28 @@ class SaleOrderLine(models.Model):
 
     @api.onchange('product_id')
     def _onchange_product_id_dimensions(self):
-        if self.product_id and self.product_id.product_tmpl_id.allow_variable_dimensions:
+        if not self.product_id:
+            return
+
+        # Check if the product allows dimensions (from template)
+        if self.product_id.product_tmpl_id.allow_variable_dimensions:
             self.allow_variable_dimensions = True
-            self.price_per_sqm = self.product_id.product_tmpl_id.price_per_sqm
-            if not self.id: # Only set defaults for new lines
+            
+            # Fetch prices
+            variant_price = self.product_id.variant_price_per_sqm
+            template_price = self.product_id.product_tmpl_id.price_per_sqm
+            
+            # PRIORITY 1: Check if this specific variant has a price set
+            if variant_price > 0:
+                self.price_per_sqm = variant_price
+            # PRIORITY 2: Fallback to the template price
+            else:
+                self.price_per_sqm = template_price
+            
+            # Set default dimensions for new lines if not set
+            if not self.x_length:
                 self.x_length = 1.0
+            if not self.x_width:
                 self.x_width = 1.0
         else:
             self.allow_variable_dimensions = False
@@ -56,6 +86,7 @@ class SaleOrderLine(models.Model):
             self.x_length = 0.0
             self.x_width = 0.0
         
+        # Recalculate the final unit price
         self._onchange_dimensions_price()
 
     @api.onchange('x_length', 'x_width', 'price_per_sqm')
@@ -92,6 +123,39 @@ class SaleOrderLine(models.Model):
                 'allow_variable_dimensions': False,
             })
         return res
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('product_id'):
+                product = self.env['product.product'].browse(vals['product_id'])
+                if product.product_tmpl_id.allow_variable_dimensions:
+                    # Force fetch variant price on create
+                    price = product.variant_price_per_sqm or product.product_tmpl_id.price_per_sqm
+                    if price > 0:
+                        vals['price_per_sqm'] = price
+                        # Recalculate unit price if dimensions are present
+                        length = vals.get('x_length', 1.0)
+                        width = vals.get('x_width', 1.0)
+                        vals['price_unit'] = length * width * price
+                        vals['allow_variable_dimensions'] = True
+
+        return super(SaleOrderLine, self).create(vals_list)
+
+    def write(self, vals):
+        # If product is changed, ensure we fetch the new price
+        if 'product_id' in vals:
+            product = self.env['product.product'].browse(vals['product_id'])
+            if product.product_tmpl_id.allow_variable_dimensions:
+                price = product.variant_price_per_sqm or product.product_tmpl_id.price_per_sqm
+                if price > 0:
+                    vals['price_per_sqm'] = price
+                    # We need to recalculate unit price, but we need current dimensions if not in vals
+                    length = vals.get('x_length', self.x_length)
+                    width = vals.get('x_width', self.x_width)
+                    vals['price_unit'] = length * width * price
+        
+        return super(SaleOrderLine, self).write(vals)
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
