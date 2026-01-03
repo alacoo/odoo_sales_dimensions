@@ -18,14 +18,14 @@ The core logic changes the **Unit Price** of the order/invoice line based on the
 - **Price per Square Meter:** Adds a `Price per Sq/m` field on the product template to define the base price for dimensional calculations.
 - **Dynamic Price Calculation:** Automatically calculates the `Unit Price` on the sale order line and invoice line using the formula: `Unit Price = Length × Width × Price per Sq/m`.
 - **Editable Price per Sq/m:** The `Price per Sq/m` can be overridden on each individual line for pricing flexibility.
-- **Sales to Invoice Flow:** When creating an invoice from a sales order, the dimensional data (`Length`, `Width`, `Price per Sq/m`) is automatically and correctly transferred to the invoice line.
+- **Sales to Invoice Flow:** When creating an invoice from a sales order, the dimensional data (`Length`, `Width`, `Price per Sq/m`) automatically and correctly transferred to the invoice line.
 - **Standalone Invoices:** The dimensional pricing logic also works on invoices created manually (without a sales order).
 
 ---
 
 ## 3. Setup and Configuration
 
-1.  **Install the Addon:** Install `sale_dimensions` as a standard Odoo addon.
+1.  **Install the Addon:** Install `ala_odoo_dimensions` as a standard Odoo addon.
 2.  **Configure a Product:**
     *   Navigate to `Sales > Products > Products` and select or create a product.
     *   Go to the **Sales** tab.
@@ -93,7 +93,7 @@ The core logic changes the **Unit Price** of the order/invoice line based on the
 
 ## 3. الإعداد والتهيئة
 
-1.  **تثبيت الإضافة:** قم بتثبيت `sale_dimensions` كإضافة قياسية في Odoo.
+1.  **تثبيت الإضافة:** قم بتثبيت `ala_odoo_dimensions` كإضافة قياسية في Odoo.
 2.  **تهيئة المنتج:**
     *   اذهب إلى `المبيعات > المنتجات > المنتجات` واختر أو أنشئ منتجًا.
     *   اذهب إلى تبويب **المبيعات**.
