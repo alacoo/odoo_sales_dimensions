@@ -1,6 +1,6 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* sale_dimensions
+# 	* ala_odoo_dimensions
 #
 msgid ""
 msgstr ""
@@ -16,33 +16,33 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#. module: sale_dimensions
-#: model:ir.model.fields,field_description:sale_dimensions.field_product_template__allow_variable_dimensions
-#: model:ir.model.fields,field_description:sale_dimensions.field_sale_order_line__allow_variable_dimensions
-#: model:ir.model.fields,field_description:sale_dimensions.field_account_move_line__allow_variable_dimensions
+#. module: ala_odoo_dimensions
+#: model:ir.model.fields,field_description:ala_odoo_dimensions.field_product_template__allow_variable_dimensions
+#: model:ir.model.fields,field_description:ala_odoo_dimensions.field_sale_order_line__allow_variable_dimensions
+#: model:ir.model.fields,field_description:ala_odoo_dimensions.field_account_move_line__allow_variable_dimensions
 msgid "Allow Variable Dimensions"
 msgstr "السماح بالأبعاد المتغيرة"
 
-#. module: sale_dimensions
-#: model:ir.model.fields,field_description:sale_dimensions.field_product_template__price_per_sqm
-#: model:ir.model.fields,field_description:sale_dimensions.field_sale_order_line__price_per_sqm
-#: model:ir.model.fields,field_description:sale_dimensions.field_account_move_line__price_per_sqm
+#. module: ala_odoo_dimensions
+#: model:ir.model.fields,field_description:ala_odoo_dimensions.field_product_template__price_per_sqm
+#: model:ir.model.fields,field_description:ala_odoo_dimensions.field_sale_order_line__price_per_sqm
+#: model:ir.model.fields,field_description:ala_odoo_dimensions.field_account_move_line__price_per_sqm
 msgid "Price per Sq/m"
 msgstr "سعر المتر المربع"
 
-#. module: sale_dimensions
-#: model:ir.model.fields,field_description:sale_dimensions.field_sale_order_line__x_length
-#: model:ir.model.fields,field_description:sale_dimensions.field_account_move_line__x_length
+#. module: ala_odoo_dimensions
+#: model:ir.model.fields,field_description:ala_odoo_dimensions.field_sale_order_line__x_length
+#: model:ir.model.fields,field_description:ala_odoo_dimensions.field_account_move_line__x_length
 msgid "Length"
 msgstr "الطول"
 
-#. module: sale_dimensions
-#: model:ir.model.fields,field_description:sale_dimensions.field_sale_order_line__x_width
-#: model:ir.model.fields,field_description:sale_dimensions.field_account_move_line__x_width
+#. module: ala_odoo_dimensions
+#: model:ir.model.fields,field_description:ala_odoo_dimensions.field_sale_order_line__x_width
+#: model:ir.model.fields,field_description:ala_odoo_dimensions.field_account_move_line__x_width
 msgid "Width"
 msgstr "العرض"
 
-#. module: sale_dimensions
-#: model:ir.model.fields,field_description:sale_dimensions.field_sale_order_line__uom_length
+#. module: ala_odoo_dimensions
+#: model:ir.model.fields,field_description:ala_odoo_dimensions.field_sale_order_line__uom_length
 msgid "Unidad de longitud"
 msgstr "وحدة الطول"
