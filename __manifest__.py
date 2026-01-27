@@ -1,7 +1,7 @@
 {
     'name': 'Sale & Invoice Dimensions',
     'technical_name': 'ala_odoo_dimensions',
-    'version': '18.0.5.0.0',
+    'version': '18.0.6.0.0',
     'category': 'Sales/Invoicing',
     'summary': 'Adds dimensional pricing (Length x Width) to Sales and Invoices.',
     'description': '''

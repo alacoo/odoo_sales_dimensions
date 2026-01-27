@@ -17,6 +17,11 @@ class ProductTemplate(models.Model):
         default=0.0,
         help='Extra length to add for production (waste/margins). This will be used in Manufacturing.'
     )
+    roll_length = fields.Float(
+        string='Roll Length (m)',
+        default=50.0,
+        help='Default roll length in linear meters. Used for inventory and consumption calculations.'
+    )
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'

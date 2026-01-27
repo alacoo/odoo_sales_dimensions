@@ -20,8 +20,8 @@
                     </group>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/list/field[@name='price_unit']" position="attributes">
-                     <attribute name="readonly">allow_variable_dimensions</attribute>
-                     <attribute name="force_save">1</attribute>
+                    <attribute name="readonly">allow_variable_dimensions</attribute>
+                    <attribute name="force_save">1</attribute>
                 </xpath>
             </field>
         </record>
@@ -35,6 +35,7 @@
                     <field name="allow_variable_dimensions"/>
                     <field name="price_per_sqm" invisible="not allow_variable_dimensions"/>
                     <field name="production_margin" invisible="not allow_variable_dimensions"/>
+                    <field name="roll_length" invisible="not allow_variable_dimensions"/>
                 </xpath>
             </field>
         </record>
