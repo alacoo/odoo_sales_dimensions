@@ -6,65 +6,128 @@ This document is also available in Arabic below.
 
 ## 1. Purpose
 
-This addon extends the functionality of Odoo Sales and Invoicing applications to allow selling products based on dimensions (length and width), with the price calculated based on the area. It is specifically designed for businesses that sell services like printing, where the price depends on the surface area of the job, and where multiple copies of the same dimensional item might be ordered.
+This addon extends Odoo Sales and Invoicing to enable selling products based on dimensions (Length × Width), with the price calculated per square meter. Designed for printing businesses where pricing depends on the surface area of the print job.
 
-The core logic changes the **Unit Price** of the order/invoice line based on the dimensions, while the **Quantity** field remains available for the user to specify the number of copies.
+The **Unit Price** is computed from dimensions, while the **Quantity** field is used for number of copies.
 
 ---
 
 ## 2. Features
 
-- **Dimensional Products:** Adds a boolean flag `Allow Variable Dimensions` on the product template.
-- **Price per Square Meter:** Adds a `Price per Sq/m` field on the product template to define the base price for dimensional calculations.
-- **Dynamic Price Calculation:** Automatically calculates the `Unit Price` on the sale order line and invoice line using the formula: `Unit Price = Length × Width × Price per Sq/m`.
-- **Editable Price per Sq/m:** The `Price per Sq/m` can be overridden on each individual line for pricing flexibility.
-- **Sales to Invoice Flow:** When creating an invoice from a sales order, the dimensional data (`Length`, `Width`, `Price per Sq/m`) automatically and correctly transferred to the invoice line.
-- **Standalone Invoices:** The dimensional pricing logic also works on invoices created manually (without a sales order).
+- **Dimensional Products:** `Allow Variable Dimensions` flag on product template
+- **Price per Square Meter:** `Price per Sq/m` field for base pricing
+- **Roll Width:** `Roll Width (m)` field on product template for raw materials
+- **Production Margin:** `Production Margin (m)` field for waste/margin calculation
+- **Roll Length:** `Roll Length (m)` field for inventory calculations
+- **Dynamic Price Calculation:** `Unit Price = Length × Width × Price per Sq/m`
+- **Editable Price per Sq/m:** Override on each individual line
+- **SO to Invoice Flow:** Dimensional data transfers correctly to invoice lines
+- **Standalone Invoices:** Dimensional pricing works on manual invoices
 
 ---
 
-## 3. Setup and Configuration
+## 3. Fields Reference
 
-1.  **Install the Addon:** Install `ala_odoo_dimensions` as a standard Odoo addon.
-2.  **Configure a Product:**
-    *   Navigate to `Sales > Products > Products` and select or create a product.
-    *   Go to the **Sales** tab.
-    *   Check the box **`Allow Variable Dimensions`**.
-    *   A new field, **`Price per Sq/m`**, will appear. Enter the price for one square meter of this product/service.
+### On `product.template`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `allow_variable_dimensions` | Boolean | Enable dimensional pricing |
+| `price_per_sqm` | Float | Base price per square meter (for sales) |
+| `x_width` | Float | Roll width in meters (e.g. 1.60) |
+| `production_margin` | Float | Extra margin in meters for waste |
+| `roll_length` | Float | Default roll length in meters (default: 50) |
+
+### On `sale.order.line` / `account.move.line`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `x_length` | Float | Print length in meters |
+| `x_width` | Float | Print width in meters |
+| `price_per_sqm` | Float | Price per sq/m (copied from product) |
+| `allow_variable_dimensions` | Boolean | Whether line uses dimensional pricing |
 
 ---
 
-## 4. Usage
+## 4. Setup and Configuration
+
+1. Install `ala_odoo_dimensions`
+2. Navigate to `Sales > Products > Products`
+3. Check **`Allow Variable Dimensions`**
+4. Enter **`Price per Sq/m`** (sell price)
+5. For raw materials (rolls), also fill:
+   - **`Roll Width`** — width in meters (e.g. `1.60`)
+   - **`Roll Length`** — default length (e.g. `50`)
+   - **`Production Margin`** — waste margin (e.g. `0.05`)
+
+---
+
+## 5. Usage
 
 ### On Sales Orders
 
-1.  Create a new quotation.
-2.  Add a dimensional product.
-3.  The fields `Length`, `Width`, and `Price per Sq/m` will appear and be editable.
-4.  Enter the desired `Length` and `Width`.
-5.  The **`Unit Price`** will be automatically updated.
-6.  Enter the number of copies in the **`Quantity`** field.
+1. Create a new quotation
+2. Add a dimensional product
+3. `Length`, `Width`, and `Price per Sq/m` fields appear
+4. Enter `Length` and `Width`
+5. **Unit Price** updates automatically: `L × W × Price/Sqm`
+6. Enter number of copies in **Quantity**
 
 ### On Invoices
 
-- **From a Sales Order:** When you create an invoice from a confirmed sales order, the dimensional data and the calculated unit price will be transferred automatically.
-- **Manual Invoice:** You can also create a new invoice, add a dimensional product, and the same logic will apply.
+- **From SO:** Dimensional data transfers automatically
+- **Manual:** Same dimensional logic applies
 
 ---
 
-## 5. Future Development Roadmap
+## 6. Cost Calculation for Materials
 
-### Phase 1: Inventory Integration (High Priority)
-- **Goal:** Automatically deduct the consumed area from raw material (rolls) inventory.
-- **Implementation:** Create a Bill of Materials (BoM) for the printing service. On sales order confirmation, a custom process will create a manufacturing order or stock move that consumes the exact area (`Length x Width x Quantity`) from a specific roll (Lot).
+For raw material (roll) products, the cost structure is:
 
-### Phase 2: Wastage Calculation
-- **Goal:** Automatically calculate and track material waste.
-- **Implementation:** Extend the inventory integration to compare the print width with the roll width and account for the wasted surface area.
+```
+standard_price = cost per linear meter
+cost_per_sqm   = standard_price / x_width
+roll_cost      = standard_price × actual_roll_length
+```
 
-### Phase 3: Advanced Pricelist Integration
-- **Goal:** Create dynamic pricing rules based on the total area.
-- **Implementation:** Develop a deeper integration with Odoo's pricelist engine to allow rules like "5% discount if total area is > 20 m²".
+**Example:** Banner Roll 280g / 1.60m width
+
+```
+standard_price = 490 YER/m (linear meter cost)
+cost_per_sqm   = 490 / 1.60 = 306.25 YER/m²
+Roll of 50m    = 490 × 50 = 24,500 YER
+Roll of 30m    = 490 × 30 = 14,700 YER
+```
+
+---
+
+## 7. Development Roadmap
+
+### ✅ Phase 1: Foundation (Current)
+
+- [x] Dimensional pricing on Sales & Invoices
+- [x] `x_width` field on `product.template` for roll width
+- [x] `production_margin` for waste calculation
+- [x] `roll_length` for inventory planning
+
+### ⬜ Phase 2: Inventory Integration
+
+- [ ] Auto-deduct consumed length from roll Lots
+- [ ] `cost_per_sqm` as computed field: `standard_price / x_width`
+- [ ] Bill of Materials linking services to materials + inks
+
+### ⬜ Phase 3: Smart Pricing
+
+- [ ] Pricelist integration with `price_per_sqm`
+- [ ] Area-based discount rules (e.g. >20m² = 5% off)
+- [ ] Customer-specific pricing per sq/m
+
+### ⬜ Phase 4: Reports & Analytics
+
+- [ ] Material consumption report (per roll, per Lot)
+- [ ] Waste/scrap percentage tracking
+- [ ] Profit margin analysis (sell price vs material cost per job)
+- [ ] Roll inventory forecasting
 
 ---
 
@@ -74,62 +137,71 @@ The core logic changes the **Unit Price** of the order/invoice line based on the
 
 ## 1. الغرض
 
-تقوم هذه الإضافة بتوسيع وظائف تطبيقي المبيعات والفواتير في Odoo للسماح ببيع المنتجات بناءً على الأبعاد (الطول والعرض)، مع حساب السعر بناءً على المساحة. وهي مصممة خصيصًا للشركات التي تبيع خدمات مثل الطباعة، حيث يعتمد السعر على مساحة العمل، وحيث يمكن طلب نسخ متعددة من نفس العنصر.
+تُوسّع هذه الإضافة وظائف المبيعات والفواتير في Odoo للسماح ببيع المنتجات بناءً على الأبعاد (الطول والعرض)، مع حساب السعر بناءً على المساحة (متر مربع).
 
-المنطق الأساسي يغير **سعر الوحدة** في سطر أمر البيع/الفاتورة بناءً على الأبعاد، بينما يظل حقل **الكمية** متاحًا للمستخدم لتحديد عدد النسخ.
+المنطق الأساسي: **سعر الوحدة = الطول × العرض × سعر المتر المربع**
 
----
-
-## 2. الميزات
-
-- **المنتجات ذات الأبعاد:** إضافة علامة `السماح بالأبعاد المتغيرة` في نموذج المنتج.
-- **سعر المتر المربع:** إضافة حقل `سعر المتر المربع` في نموذج المنتج لتحديد السعر الأساسي للحسابات.
-- **حساب السعر الديناميكي:** حساب `سعر الوحدة` تلقائيًا في سطر أمر البيع والفاتورة باستخدام المعادلة: `سعر الوحدة = الطول × العرض × سعر المتر المربع`.
-- **سعر متر مربع قابل للتعديل:** يمكن تعديل `سعر المتر المربع` في كل سطر على حدة لمزيد من المرونة.
-- **نقل البيانات من البيع إلى الفاتورة:** عند إنشاء فاتورة من أمر بيع، يتم نقل بيانات الأبعاد والسعر المحسوب تلقائيًا إلى سطر الفاتورة.
-- **الفواتير المستقلة:** يعمل منطق تسعير الأبعاد أيضًا على الفواتير التي يتم إنشاؤها يدويًا.
+حقل **الكمية** يبقى متاحاً لعدد النسخ.
 
 ---
 
-## 3. الإعداد والتهيئة
+## 2. الحقول المضافة
 
-1.  **تثبيت الإضافة:** قم بتثبيت `ala_odoo_dimensions` كإضافة قياسية في Odoo.
-2.  **تهيئة المنتج:**
-    *   اذهب إلى `المبيعات > المنتجات > المنتجات` واختر أو أنشئ منتجًا.
-    *   اذهب إلى تبويب **المبيعات**.
-    *   قم بتفعيل خيار **`السماح بالأبعاد المتغيرة`**.
-    *   سيظهر حقل جديد **`سعر المتر المربع`**. أدخل السعر للمتر المربع الواحد لهذا المنتج/الخدمة.
+### على المنتج (`product.template`)
 
----
-
-## 4. طريقة الاستخدام
-
-### في أوامر البيع
-
-1.  أنشئ عرض سعر جديد.
-2.  أضف منتجًا ذا أبعاد.
-3.  ستظهر حقول `الطول` و`العرض` و`سعر المتر المربع` وستكون قابلة للتعديل.
-4.  أدخل `الطول` و`العرض` المطلوبين.
-5.  سيتم تحديث **`سعر الوحدة`** تلقائيًا.
-6.  أدخل عدد النسخ في حقل **`الكمية`**.
-
-### في الفواتير
-
-- **من أمر بيع:** عند إنشاء فاتورة من أمر بيع مؤكد، سيتم نقل بيانات الأبعاد وسعر الوحدة المحسوب تلقائيًا.
-- **فاتورة يدوية:** يمكنك أيضًا إنشاء فاتورة جديدة وإضافة منتج ذي أبعاد، وسيتم تطبيق نفس المنطق.
+| الحقل | الوصف | مثال |
+|-------|-------|------|
+| `allow_variable_dimensions` | تفعيل التسعير بالأبعاد | ✅ |
+| `price_per_sqm` | سعر البيع للمتر المربع | 150 ر.ي |
+| `x_width` | عرض الرولة بالمتر | 1.60 |
+| `production_margin` | هامش الهدر بالمتر | 0.05 |
+| `roll_length` | طول الرولة الافتراضي | 50 |
 
 ---
 
-## 5. خارطة الطريق المستقبلية
+## 3. حساب التكاليف للخامات
 
-### المرحلة الأولى: التكامل مع المخزون (أولوية عالية)
-- **الهدف:** خصم المساحة المستخدمة تلقائيًا من مخزون المواد الخام (الرولات).
-- **التنفيذ:** إنشاء قائمة مواد (BoM) لخدمة الطباعة. عند تأكيد أمر البيع، ستقوم عملية مخصصة بإنشاء أمر تصنيع أو حركة مخزون تستهلك المساحة الدقيقة (`الطول × العرض × الكمية`) من رولة معينة (Lot).
+```
+سعر المتر الطولي (standard_price) = تكلفة الشراء / الطول الفعلي
+تكلفة المتر المربع = سعر_المتر_الطولي ÷ عرض_الرولة
+تكلفة الرولة = سعر_المتر_الطولي × الطول_الفعلي
+```
 
-### المرحلة الثانية: حساب الهدر
-- **الهدف:** حساب وتتبع هدر المواد تلقائيًا.
-- **التنفيذ:** توسيع التكامل مع المخزون لمقارنة عرض الطباعة بعرض الرولة وحساب مساحة السطح المهدرة.
+**مثال:** رولة بنر 280g عرض 1.60م
 
-### المرحلة الثالثة: تكامل متقدم مع قوائم الأسعار
-- **الهدف:** إنشاء قواعد تسعير ديناميكية بناءً على المساحة الإجمالية.
-- **التنفيذ:** تطوير تكامل أعمق مع محرك قوائم الأسعار في Odoo للسماح بقواعد مثل "خصم 5% إذا كانت المساحة الإجمالية أكبر من 20 م²".
+```
+سعر المتر الطولي  = 490 ريال
+تكلفة المتر المربع = 490 ÷ 1.60 = 306.25 ريال/م²
+رولة 50م          = 490 × 50 = 24,500 ريال
+رولة 30م          = 490 × 30 = 14,700 ريال
+```
+
+---
+
+## 4. خارطة الطريق
+
+### ✅ المرحلة 1: الأساسيات (الحالية)
+
+- [x] التسعير بالأبعاد في المبيعات والفواتير
+- [x] حقل `x_width` على المنتج لعرض الرولة
+- [x] حقل `production_margin` للهدر
+- [x] وحدة القياس = متر طولي (للتتبع الدقيق)
+
+### ⬜ المرحلة 2: ربط المخزون
+
+- [ ] خصم الطول المستخدم تلقائياً من الـ Lot
+- [ ] `cost_per_sqm` حقل محسوب تلقائياً
+- [ ] قوائم مواد (BoM) تربط الخدمات بالخامات
+
+### ⬜ المرحلة 3: التسعير الذكي
+
+- [ ] تكامل قوائم الأسعار مع `price_per_sqm`
+- [ ] خصومات حسب المساحة الإجمالية
+- [ ] أسعار خاصة لكل عميل
+
+### ⬜ المرحلة 4: التقارير والتحليلات
+
+- [ ] تقرير استهلاك الخامات (لكل رولة / Lot)
+- [ ] تتبع نسبة الهدر
+- [ ] تحليل هامش الربح (سعر البيع vs تكلفة الخامة)
+- [ ] توقعات مخزون الرولات

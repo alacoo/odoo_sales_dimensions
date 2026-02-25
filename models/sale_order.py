@@ -12,6 +12,11 @@ class ProductTemplate(models.Model):
         string='Price per Sq/m',
         help='The base price per square meter. Can be overridden in Variants.'
     )
+    x_width = fields.Float(
+        string='Roll Width (m)',
+        default=0.0,
+        help='Roll width in meters. Used for cost-per-sqm calculation and frontend display. Example: 1.60 for a 160cm wide roll.'
+    )
     production_margin = fields.Float(
         string='Production Margin (m)',
         default=0.0,
@@ -22,6 +27,17 @@ class ProductTemplate(models.Model):
         default=50.0,
         help='Default roll length in linear meters. Used for inventory and consumption calculations.'
     )
+    cost_per_sqm = fields.Float(
+        string='Cost per Sq/m',
+        compute='_compute_cost_per_sqm',
+        store=True,
+        help='تكلفة المتر المربع = سعر المتر الطولي ÷ عرض الرولة'
+    )
+
+    @api.depends('standard_price', 'x_width')
+    def _compute_cost_per_sqm(self):
+        for rec in self:
+            rec.cost_per_sqm = rec.standard_price / rec.x_width if rec.x_width > 0 else 0
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
